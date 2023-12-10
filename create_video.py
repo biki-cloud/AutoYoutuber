@@ -50,9 +50,17 @@ posts = thread.get_posts()
 
 # voice comment
 voicebox = VoiceBox(logger)
-saved_wav_path1 = voicebox.text_to_voice(posts[0].comment, f"{case['prefix']}_{posts[0].index}")
-saved_wav_path2 = voicebox.text_to_voice(posts[1].comment, f"{case['prefix']}_{posts[1].index}")
-# for post in posts:
-#     saved_wav_path = voicebox.text_to_voice(post.comment, f"{case['prefix']}_{post.index}")
+wav_save_paths = []
+comments = []
+limits = 2
+idx = 0
+for post in posts:
+    comments.append(post.comment)
+    wav_save_paths.append(voicebox.text_to_voice(post.comment, f"{case['prefix']}_{post.index}"))
+    idx += 1
+    if idx >= limits:
+        break
 
-craete_movie([posts[0].comment, posts[1].comment], [saved_wav_path1, saved_wav_path2])
+craete_movie(comments, wav_save_paths)
+
+# 音声の合計時間を計算して、元動画の長さを増やす必要がある。リピートして。

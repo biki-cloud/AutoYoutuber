@@ -1,11 +1,14 @@
 import os
 from typing import List
 
-from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip
+from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip
 
 def craete_movie(telops: List[str], wav_paths: List[str]):
     # ffmpegの実行可能ファイルのパスを設定
     os.environ["IMAGEIO_FFMPEG_EXE"] = "/opt/homebrew/bin/ffmpeg"
+
+    # 背景となる静止画像の読み込み
+    # video_clip = ImageClip("./assets/image/background_image.png", duration=40000)  # 例: 10秒間表示
 
     # 動画ファイルの読み込み
     video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH"))
