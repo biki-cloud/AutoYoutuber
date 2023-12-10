@@ -30,7 +30,7 @@ cases = [
     }
 ]
 
-case = cases[1]
+case = cases[0]
 
 dryrun = True
 
@@ -50,9 +50,9 @@ posts = thread.get_posts()
 
 # voice comment
 voicebox = VoiceBox(logger)
-post = posts[0]
-saved_wav_path = voicebox.text_to_voice(post.comment, f"{case['prefix']}_{post.index}")
+saved_wav_path1 = voicebox.text_to_voice(posts[0].comment, f"{case['prefix']}_{posts[0].index}")
+saved_wav_path2 = voicebox.text_to_voice(posts[1].comment, f"{case['prefix']}_{posts[1].index}")
 # for post in posts:
 #     saved_wav_path = voicebox.text_to_voice(post.comment, f"{case['prefix']}_{post.index}")
 
-craete_movie(post.comment, saved_wav_path)
+craete_movie([posts[0].comment, posts[1].comment], [saved_wav_path1, saved_wav_path2])
