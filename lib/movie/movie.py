@@ -10,7 +10,6 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
     # 動画ファイルの読み込み
     video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH"))
 
-    telops = ["s" * 100, "s" * 100]
     text_clips = []
     audio_clips = []
     start_time = 1
@@ -21,14 +20,15 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
         audio_clips.append(audio_clip)
 
         # 入れる文字を決定する
-        txt_clip = TextClip(telop,fontsize=100,color='white')
+        # 日本語対応のフォントを指定しないとてテロップで日本語が表示されない
+        txt_clip = TextClip(telop,fontsize=100,color='white',font='/System/Library/Fonts/ヒラギノ明朝 ProN.ttc')
         # duration:表示する秒数、start：何秒後にスタートさせるか
         text_clip = txt_clip.set_pos(('center', 'center')).set_duration(audio_clip.duration).set_start(start_time)
         text_clips.append(text_clip)
 
         start_time += audio_clip.duration + 1
     
-    
+
     # 複数のテロップを統合
     composite_clip = CompositeVideoClip([video_clip, *text_clips])
 
