@@ -1,0 +1,4 @@
+env.sh
+save/
+youtube_api_secrets.json
+/lib/youtube/youtube.py-oauth2.json
