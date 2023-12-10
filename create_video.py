@@ -55,12 +55,10 @@ comments = []
 limits = 2
 idx = 0
 for post in posts:
-    comments.append(post.comment)
+    comments.append(post.default_post())
     wav_save_paths.append(voicebox.text_to_voice(post.comment, f"{case['prefix']}_{post.index}"))
     idx += 1
     if idx >= limits:
         break
 
 craete_movie(comments, wav_save_paths)
-
-# 音声の合計時間を計算して、元動画の長さを増やす必要がある。リピートして。

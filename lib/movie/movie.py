@@ -7,12 +7,6 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
     # ffmpegの実行可能ファイルのパスを設定
     os.environ["IMAGEIO_FFMPEG_EXE"] = "/opt/homebrew/bin/ffmpeg"
 
-    # 背景となる静止画像の読み込み
-    # video_clip = ImageClip("./assets/image/background_image.png", duration=40000)  # 例: 10秒間表示
-
-    # 動画ファイルの読み込み
-    video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH"))
-
     text_clips = []
     audio_clips = []
     start_time = 1
@@ -24,13 +18,16 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
         # 入れる文字を決定する
         # 日本語対応のフォントを指定しないとてテロップで日本語が表示されない
-        txt_clip = TextClip(telop,fontsize=100,color='white',font='/System/Library/Fonts/ヒラギノ明朝 ProN.ttc')
+        txt_clip = TextClip(telop,fontsize=50,color='white',font='/System/Library/Fonts/ヒラギノ明朝 ProN.ttc')
         # duration:表示する秒数、start：何秒後にスタートさせるか
         text_clip = txt_clip.set_pos(('center', 'center')).set_duration(audio_clip.duration).set_start(start_time)
         text_clips.append(text_clip)
 
         start_time += audio_clip.duration + 1
     
+    # 動画ファイルの読み込み. 背景動画の読み込みとループ設定
+    # duration: 動画全体の長さ
+    video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH")).loop(duration=start_time)
 
     # 複数のテロップを統合
     composite_clip = CompositeVideoClip([video_clip, *text_clips])

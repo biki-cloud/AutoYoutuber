@@ -5,6 +5,8 @@ import json
 import sounddevice as sd
 import numpy as np
 import os
+import wave
+import contextlib
 
 class VoiceBox:
     def __init__(self, logger):
@@ -70,3 +72,11 @@ class VoiceBox:
         self.play_wavfile(wav)
         self.logger.debug("saving wavfile...")
         return self.save_wavfile(wav, savefile_prefix)
+
+def get_wav_duration(wav_filename: str) -> float:
+    # wavファイルの再生時間(秒)を取得する
+    with contextlib.closing(wave.open(wav_filename, 'r')) as f:
+        frames = f.getnframes()
+        rate = f.getframerate()
+        duration = frames / float(rate)
+        return duration
