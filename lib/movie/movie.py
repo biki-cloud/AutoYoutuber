@@ -1,10 +1,12 @@
 import os
 from typing import List
 
+from lib.movie.image import resize
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip
 
 # 背景に動画を使うかどうか. Falseの場合は画像を使う
 is_bg_movie = False
+bg_size = (1920, 1080)
 
 
 def craete_movie(telops: List[str], wav_paths: List[str]):
@@ -13,11 +15,13 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
     # 動画ファイルの読み込み. 背景動画の読み込みとループ設定
     # duration: 動画全体の長さ
-    video_clip = None
     if is_bg_movie:
         video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH"))
+        print(video_clip.size) # [1920, 1080]
     else:
-        video_clip = ImageClip(os.environ.get("BACKGROUND_IMAGE_PATH"))
+        img_path = os.environ.get("BACKGROUND_IMAGE_PATH")
+        resize(img_path, bg_size)
+        video_clip = ImageClip(img_path)
 
     text_clips = []
     audio_clips = []
@@ -39,13 +43,16 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
         start_time += audio_clip.duration + 1
 
-    # 背景動画をループさせる
-    if is_bg_movie:
-        video_clip = video_clip.loop(duration=start_time)
-    else:
-        video_clip = video_clip.set_duration(start_time)
+    # 動画全体の長さを決定
+    movie_all_duration = start_time
 
-    # 複数のテロップを統合
+    # 背景を動画最後まで設定する
+    if is_bg_movie:
+        video_clip = video_clip.loop(duration=movie_all_duration)
+    else:
+        video_clip = video_clip.set_duration(movie_all_duration)
+
+    # 複数のテロップを動画に統合
     composite_clip = CompositeVideoClip([video_clip, *text_clips])
 
     # BGMを読み込み
