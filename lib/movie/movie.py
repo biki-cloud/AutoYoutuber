@@ -3,9 +3,21 @@ from typing import List
 
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip
 
+# 背景に動画を使うかどうか. Falseの場合は画像を使う
+is_bg_movie = False
+
+
 def craete_movie(telops: List[str], wav_paths: List[str]):
     # ffmpegの実行可能ファイルのパスを設定
     os.environ["IMAGEIO_FFMPEG_EXE"] = "/opt/homebrew/bin/ffmpeg"
+
+    # 動画ファイルの読み込み. 背景動画の読み込みとループ設定
+    # duration: 動画全体の長さ
+    video_clip = None
+    if is_bg_movie:
+        video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH"))
+    else:
+        video_clip = ImageClip(os.environ.get("BACKGROUND_IMAGE_PATH"))
 
     text_clips = []
     audio_clips = []
@@ -19,16 +31,19 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
         # 入れる文字を決定する
         # 日本語対応のフォントを指定しないとてテロップで日本語が表示されない
-        txt_clip = TextClip(telop,fontsize=50,color='white',font='/System/Library/Fonts/ヒラギノ明朝 ProN.ttc')
+        txt_clip = TextClip(telop, fontsize=50, color='blue', font='/System/Library/Fonts/ヒラギノ明朝 ProN.ttc',
+                            bg_color='yellow')
         # duration:表示する秒数、start：何秒後にスタートさせるか
         text_clip = txt_clip.set_pos(('center', 'center')).set_duration(audio_clip.duration).set_start(start_time)
         text_clips.append(text_clip)
 
         start_time += audio_clip.duration + 1
-    
-    # 動画ファイルの読み込み. 背景動画の読み込みとループ設定
-    # duration: 動画全体の長さ
-    video_clip = VideoFileClip(os.environ.get("BACKGROUND_MOVIE_PATH")).loop(duration=start_time)
+
+    # 背景動画をループさせる
+    if is_bg_movie:
+        video_clip = video_clip.loop(duration=start_time)
+    else:
+        video_clip = video_clip.set_duration(start_time)
 
     # 複数のテロップを統合
     composite_clip = CompositeVideoClip([video_clip, *text_clips])
@@ -47,7 +62,11 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
     video_clip = composite_clip.set_audio(composite_audio)
 
     # 最終動画の書き出し
-    video_clip.write_videofile(os.environ.get("OUTPUT_MOVIE_PATH"))
+    if is_bg_movie:
+        video_clip.write_videofile(os.environ.get("OUTPUT_MOVIE_PATH"))
+    else:
+        video_clip.write_videofile(os.environ.get("OUTPUT_MOVIE_PATH"), fps=24)
+
 
 if __name__ == "__main__":
     craete_movie("test", "test.wav")
