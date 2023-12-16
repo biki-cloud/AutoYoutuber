@@ -14,6 +14,7 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
         # ------------------------------
         # 音声ファイルの読み込み
         audio_clip = AudioFileClip(wav_path).set_start(start_time)
+        audio_clip = audio_clip.volumex(1.5)
         audio_clips.append(audio_clip)
 
         # 入れる文字を決定する
@@ -31,6 +32,13 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
     # 複数のテロップを統合
     composite_clip = CompositeVideoClip([video_clip, *text_clips])
+
+    # BGMを読み込み
+    bgm_audio_clip = AudioFileClip(os.environ.get("BGM_MOVIE_PATH"))
+    # オーディオクリップを動画の長さに合わせて調整
+    bgm_audio_clip = bgm_audio_clip.subclip(0, video_clip.duration)
+    bgm_audio_clip = bgm_audio_clip.volumex(0.05)
+    audio_clips.append(bgm_audio_clip)
 
     # 複数の音声クリップを統合
     composite_audio = CompositeAudioClip([*audio_clips])
