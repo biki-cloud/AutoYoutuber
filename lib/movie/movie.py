@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from lib.movie.image import resize
-from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip
+from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip, concatenate_audioclips
 
 # 背景に動画を使うかどうか. Falseの場合は画像を使う
 is_bg_movie = False
@@ -59,7 +59,15 @@ def craete_movie(telops: List[str], wav_paths: List[str], logger):
 
     # BGMを読み込み
     bgm_audio_clip = AudioFileClip(os.environ.get("BGM_MOVIE_PATH"))
-    # TODO: 現在だとBGMの長さが動画の長さより短い場合にエラーが出る
+    # BGMの長さが動画の長さより短い場合に対応
+    if bgm_audio_clip.duration < movie_all_duration:
+        # BGMをループさせるためのクリップリストを作成
+        bgm_clips = [bgm_audio_clip]
+        while sum(clip.duration for clip in bgm_clips) < movie_all_duration:
+            bgm_clips.append(bgm_audio_clip)
+        # クリップを連結して一つのオーディオクリップにする
+        bgm_audio_clip = concatenate_audioclips(bgm_clips)
+    # 必要な長さにトリミング
     bgm_audio_clip = bgm_audio_clip.subclip(0, movie_all_duration)
     bgm_audio_clip = bgm_audio_clip.volumex(0.05)
     audio_clips.append(bgm_audio_clip)
