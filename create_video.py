@@ -27,20 +27,27 @@ cases = [
         "prefix": "employee",
         "save_html_path": os.path.join(html_save_dir, "employee.html"),
         "url": "https://nozomi.2ch.sc/test/read.cgi/employee/1462624724/0-"
+    },
+    {
+        "prefix": "news4vip",
+        "save_html_path": os.path.join(html_save_dir, "news4vip.html"),
+        "url": "https://nozomi.2ch.sc/test/read.cgi/be/1575083477/"
     }
 ]
 
-case = cases[0]
+case = cases[2]
 
-dryrun = True
+is_scrape = False
 
-if dryrun:
+if is_scrape:
     # temp read html
+    logger.info("read html...")
     html_content = ""
     with open(case["save_html_path"], "r", encoding='utf-8') as f:
         html_content = f.read()
 else:
     # scraper
+    logger.info("scrape start...")
     scraper = Scraper()
     html_content = scraper.scrape(case["url"], "test")
 
@@ -52,7 +59,8 @@ posts = thread.get_posts()
 voicebox = VoiceBox(logger)
 wav_save_paths = []
 comments = []
-limits = 2
+# どのくらいのコメントを読み、動画を作成するか
+limits = 100
 idx = 0
 for post in posts:
     comments.append(post.default_post())
@@ -61,4 +69,4 @@ for post in posts:
     if idx >= limits:
         break
 
-craete_movie(comments, wav_save_paths)
+craete_movie(comments, wav_save_paths, logger)

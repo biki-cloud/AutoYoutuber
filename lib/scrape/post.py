@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup, ResultSet
 import bs4
+import re
 
 class Post:
     def __init__(self, data: bs4.element.Tag):
@@ -12,6 +13,14 @@ class Post:
 
         self.parse_data(data)
     
+    def comment_replace_to_proper(self, comment):
+        # HTTPのURLを取り除くための正規表現パターン
+        # pattern = r'http[s]?://[^\s]+'
+        pattern = r'\w+://[^\s]+'
+        # 正規表現を使用してURLを取り除く
+        result_str = re.sub(pattern, '', comment)
+        return result_str
+    
     def parse_data(self, data: bs4.element.Tag):
         """
         postをパースして、各プロパティに格納する
@@ -23,6 +32,7 @@ class Post:
         self.name = data.find('b').get_text()
         comment = data.find('dd').get_text().split("\n")[0]
         self.comment = comment.replace("  ", "\n")
+        self.comment = self.comment_replace_to_proper(self.comment)
 
         splited_content = dt_texts[2].split(" ")
         self.date = splited_content[0]

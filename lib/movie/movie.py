@@ -9,7 +9,8 @@ is_bg_movie = False
 bg_size = (1920, 1080)
 
 
-def craete_movie(telops: List[str], wav_paths: List[str]):
+def craete_movie(telops: List[str], wav_paths: List[str], logger):
+    logger.name = __name__
     # ffmpegの実行可能ファイルのパスを設定
     os.environ["IMAGEIO_FFMPEG_EXE"] = "/opt/homebrew/bin/ffmpeg"
 
@@ -45,6 +46,7 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
     # 動画全体の長さを決定
     movie_all_duration = start_time
+    logger.debug(f"movie_all_duration: {movie_all_duration}")
 
     # 背景を動画最後まで設定する
     if is_bg_movie:
@@ -57,8 +59,8 @@ def craete_movie(telops: List[str], wav_paths: List[str]):
 
     # BGMを読み込み
     bgm_audio_clip = AudioFileClip(os.environ.get("BGM_MOVIE_PATH"))
-    # オーディオクリップを動画の長さに合わせて調整
-    bgm_audio_clip = bgm_audio_clip.subclip(0, video_clip.duration)
+    # TODO: 現在だとBGMの長さが動画の長さより短い場合にエラーが出る
+    bgm_audio_clip = bgm_audio_clip.subclip(0, movie_all_duration)
     bgm_audio_clip = bgm_audio_clip.volumex(0.05)
     audio_clips.append(bgm_audio_clip)
 

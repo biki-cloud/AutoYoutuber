@@ -27,7 +27,7 @@ class VoiceBox:
         )
 
         query_data = res.json()
-        query_data["speedScale"] = 1.5
+        query_data["speedScale"] = 1.1
 
         return query_data
 
@@ -68,8 +68,8 @@ class VoiceBox:
         res = self.post_audio_query(text)
         self.logger.debug("post synthesis...")
         wav = self.post_synthesis(res)
-        self.logger.debug("playing wavfile...")
-        self.play_wavfile(wav)
+        # self.logger.debug("playing wavfile...")
+        # self.play_wavfile(wav)
         self.logger.debug("saving wavfile...")
         return self.save_wavfile(wav, savefile_prefix)
 
