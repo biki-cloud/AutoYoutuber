@@ -31,25 +31,26 @@ cases = [
     {
         "prefix": "news4vip",
         "save_html_path": os.path.join(html_save_dir, "news4vip.html"),
-        "url": "https://nozomi.2ch.sc/test/read.cgi/be/1575083477/"
+        "url": "https://nozomi.2ch.sc/test/read.cgi/be/1666312450/"
     }
 ]
 
 case = cases[2]
 
-is_scrape = False
+is_scrape = True
 
 if is_scrape:
+    # scraper
+    logger.info("scrape start...")
+    scraper = Scraper()
+    html_content = scraper.scrape(case["url"], "test")
+else:
     # temp read html
     logger.info("read html...")
     html_content = ""
     with open(case["save_html_path"], "r", encoding='utf-8') as f:
         html_content = f.read()
-else:
-    # scraper
-    logger.info("scrape start...")
-    scraper = Scraper()
-    html_content = scraper.scrape(case["url"], "test")
+    
 
 # get posts
 thread = Thread(html_content)
